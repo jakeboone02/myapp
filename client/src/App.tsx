@@ -1,11 +1,12 @@
-import './App.scss';
-import QueryBuilder, { formatQuery, RuleGroupType } from "react-querybuilder";
 import { useState } from 'react';
+import QueryBuilder, { formatQuery, RuleGroupType } from "react-querybuilder";
+import './App.scss';
+import combinators from './combinators';
+import CombinatorSelector from './CombinatorSelector';
 import fields from './fields';
 import getOperators from './getOperators';
-import { Language } from './types';
 import translations from './translations';
-import combinators from './combinators';
+import { Language } from './types';
 
 function App() {
   const [query, setQuery] = useState<RuleGroupType>({
@@ -28,6 +29,9 @@ function App() {
         getOperators={getOperators}
         translations={translations[language]}
         combinators={combinators[language]}
+        controlElements={{
+          combinatorSelector: CombinatorSelector,
+        }}
       />
       <pre>{formatQuery(query, 'sql')}</pre>
       <pre>{formatQuery(query, 'json')}</pre>
