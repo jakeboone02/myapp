@@ -79,10 +79,12 @@ const fields: Field[] = [
   {
     name: "order_date",
     label: "Order Date",
+    datatype: "date",
   },
   {
     name: "ship_date",
     label: "Ship Date",
+    datatype: "date",
   },
   {
     name: "units_sold",

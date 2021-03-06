@@ -7,6 +7,7 @@ import fields from './fields';
 import getOperators from './getOperators';
 import translations from './translations';
 import { Language } from './types';
+import ValueEditor from './ValueEditor';
 
 function App() {
   const [query, setQuery] = useState<RuleGroupType>({
@@ -31,6 +32,7 @@ function App() {
         combinators={combinators[language]}
         controlElements={{
           combinatorSelector: CombinatorSelector,
+          valueEditor: ValueEditor,
         }}
       />
       <pre>{formatQuery(query, 'sql')}</pre>
