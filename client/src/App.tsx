@@ -1,5 +1,8 @@
+import "ag-grid-community/dist/styles/ag-grid.css";
+import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+import { AgGridReact } from "ag-grid-react";
 import { useState } from "react";
-import QueryBuilder, { formatQuery, RuleGroupType } from "react-querybuilder";
+import QueryBuilder, { RuleGroupType } from "react-querybuilder";
 import "./App.scss";
 import combinators from "./combinators";
 import CombinatorSelector from "./CombinatorSelector";
@@ -8,7 +11,12 @@ import getOperators from "./getOperators";
 import translations from "./translations";
 import { Language } from "./types";
 import ValueEditor from "./ValueEditor";
-import valueProcessor from "./valueProcessor";
+
+const columnDefs = fields.map((f) => ({
+  ...f,
+  field: f.name,
+  headerName: f.label,
+}));
 
 function App() {
   const [query, setQuery] = useState<RuleGroupType>({
@@ -65,8 +73,13 @@ function App() {
         }}
       />
       <button onClick={getData}>Get Data</button>
-      <pre>{formatQuery(query, { format: "sql", valueProcessor })}</pre>
-      <pre>{formatQuery(query, "json")}</pre>
+      <div className="ag-theme-alpine" style={{ height: 400, width: "100%" }}>
+        <AgGridReact
+          columnDefs={columnDefs}
+          rowData={rawData}
+          suppressPropertyNamesCheck
+        />
+      </div>
     </>
   );
 }

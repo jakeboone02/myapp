@@ -1,4 +1,6 @@
 // fields.ts
+import { ICellRendererParams } from "ag-grid-community";
+import { format, parseISO } from "date-fns";
 import { Field } from "react-querybuilder";
 
 const priorities = [
@@ -7,6 +9,9 @@ const priorities = [
   { name: "M", label: "Medium" },
   { name: "L", label: "Low" },
 ];
+
+const prioritiesRefData: Record<string, string> = {};
+priorities.forEach((p) => (prioritiesRefData[p.name] = p.label));
 
 const itemTypes = [
   { name: "Baby Food", label: "Baby Food" },
@@ -39,11 +44,15 @@ const regions = [
   { name: "Sub-Saharan Africa", label: "Sub-Saharan Africa" },
 ];
 
+const dateCellRenderer = ({ value }: ICellRendererParams) =>
+  value ? format(parseISO(value), "yyyy-MM-dd") : null;
+
 const fields: Field[] = [
   {
     name: "order_id",
     label: "Order ID",
     inputType: "number",
+    type: "rightAligned",
   },
   {
     name: "region",
@@ -75,46 +84,55 @@ const fields: Field[] = [
     label: "Order Priority",
     valueEditorType: "select",
     values: priorities,
+    refData: prioritiesRefData,
   },
   {
     name: "order_date",
     label: "Order Date",
     datatype: "date",
+    cellRenderer: dateCellRenderer,
   },
   {
     name: "ship_date",
     label: "Ship Date",
     datatype: "date",
+    cellRenderer: dateCellRenderer,
   },
   {
     name: "units_sold",
     label: "Units Sold",
     inputType: "number",
+    type: "rightAligned",
   },
   {
     name: "unit_price",
     label: "Unit Price",
     inputType: "number",
+    type: "rightAligned",
   },
   {
     name: "unit_cost",
     label: "Unit Cost",
     inputType: "number",
+    type: "rightAligned",
   },
   {
     name: "total_revenue",
     label: "Total Revenue",
     inputType: "number",
+    type: "rightAligned",
   },
   {
     name: "total_cost",
     label: "Total Cost",
     inputType: "number",
+    type: "rightAligned",
   },
   {
     name: "total_profit",
     label: "Total Profit",
     inputType: "number",
+    type: "rightAligned",
   },
 ];
 
