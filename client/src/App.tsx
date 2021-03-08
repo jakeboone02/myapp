@@ -17,6 +17,31 @@ function App() {
     rules: [],
   });
   const [language, setLanguage] = useState<Language>("en");
+  const [rawData, setRawData] = useState<any[]>([]);
+
+  const getData = async () => {
+    const body = JSON.stringify(query);
+    const headers = new Headers({ "Content-Type": "application/json" });
+
+    let res: { data: any[]; chartData: any[]; error?: string } = {
+      data: [],
+      chartData: [],
+    };
+
+    try {
+      res = await (
+        await fetch("/api/sales", { method: "POST", body, headers })
+      ).json();
+    } catch (err) {
+      console.log(err);
+    }
+
+    if (res.error) {
+      console.log(res.error);
+    } else {
+      setRawData(res.data);
+    }
+  };
 
   return (
     <>
@@ -39,6 +64,7 @@ function App() {
           valueEditor: ValueEditor,
         }}
       />
+      <button onClick={getData}>Get Data</button>
       <pre>{formatQuery(query, { format: "sql", valueProcessor })}</pre>
       <pre>{formatQuery(query, "json")}</pre>
     </>
