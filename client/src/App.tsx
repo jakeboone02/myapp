@@ -1,6 +1,8 @@
+import { AgChartsReact } from "ag-charts-react";
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
+import { parseISO } from "date-fns";
 import { useState } from "react";
 import QueryBuilder, { RuleGroupType } from "react-querybuilder";
 import "./App.scss";
@@ -11,6 +13,9 @@ import getOperators from "./getOperators";
 import translations from "./translations";
 import { Language } from "./types";
 import ValueEditor from "./ValueEditor";
+
+const processChartData = (chartData: any[]) =>
+  chartData.map((cd) => ({ ...cd, order_month: parseISO(cd.order_month) }));
 
 const columnDefs = fields.map((f) => ({
   ...f,
@@ -26,6 +31,7 @@ function App() {
   });
   const [language, setLanguage] = useState<Language>("en");
   const [rawData, setRawData] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
 
   const getData = async () => {
     const body = JSON.stringify(query);
@@ -48,6 +54,7 @@ function App() {
       console.log(res.error);
     } else {
       setRawData(res.data);
+      setChartData(res.chartData);
     }
   };
 
@@ -80,6 +87,33 @@ function App() {
           suppressPropertyNamesCheck
         />
       </div>
+      <AgChartsReact
+        options={{
+          data: processChartData(chartData),
+          series: [
+            {
+              type: "line",
+              xKey: "order_month",
+              yKey: "revenue",
+            },
+            {
+              type: "line",
+              xKey: "order_month",
+              yKey: "profit",
+            },
+          ],
+          axes: [
+            {
+              type: "time",
+              position: "bottom",
+            },
+            {
+              type: "number",
+              position: "left",
+            },
+          ],
+        }}
+      />
     </>
   );
 }
