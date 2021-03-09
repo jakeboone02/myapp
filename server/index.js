@@ -8,7 +8,7 @@ const processSQL = require("./processSQL");
 const PORT = process.env.PORT || 5000;
 const DEV_MODE = process.env.DEV_MODE === "true";
 
-types.setTypeParser(1700, val => parseFloat(val));
+types.setTypeParser(1700, (val) => parseFloat(val));
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -52,6 +52,26 @@ app.post("/api/sales", async (req, res) => {
   }
 
   res.json({ data, chartData, error: null });
-})
+});
+
+app.post("/api/unlocode", async (req, res) => {
+  const query = req.body;
+  const { sql, params } = formatQuery(query, "parameterized");
+  const whereClause = processSQL(sql);
+  const selectRawData = `SELECT * FROM unlocode WHERE ${whereClause} ORDER BY id ASC`;
+  console.log(selectRawData);
+  console.log(params);
+
+  let data = [];
+  try {
+    data = (await pool.query(selectRawData, params)).rows;
+  } catch (error) {
+    console.log(error);
+    res.json({ data: [], error });
+    return;
+  }
+
+  res.json({ data, error: null });
+});
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));

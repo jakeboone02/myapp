@@ -6,7 +6,7 @@ const processSQL = (sql) => {
       return `$${i}`;
     })
     .replace(
-      /\b(order_date|ship_date) (=|!=|<|>|<=|>=) (\$\d+)\b/gi,
+      /\b(date|order_date|ship_date) (=|!=|<|>|<=|>=) (\$\d+)\b/gi,
       `$1 $2 $3::date`
     );
 };
