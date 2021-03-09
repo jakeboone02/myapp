@@ -11,7 +11,7 @@ import CombinatorSelector from "./CombinatorSelector";
 import fields from "./fields";
 import getOperators from "./getOperators";
 import translations from "./translations";
-import { Language } from "./types";
+import { Dataset, Language } from "./types";
 import ValueEditor from "./ValueEditor";
 
 const processChartData = (chartData: any[]) =>
@@ -29,9 +29,15 @@ function App() {
     combinator: "and",
     rules: [],
   });
+  const [queryUNL, setQueryUNL] = useState<RuleGroupType>({
+    id: "root",
+    combinator: "and",
+    rules: [],
+  });
   const [language, setLanguage] = useState<Language>("en");
   const [rawData, setRawData] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
+  const [dataset, setDataset] = useState<Dataset>("sales");
 
   const getData = async () => {
     const body = JSON.stringify(query);
@@ -67,10 +73,17 @@ function App() {
         <option value="en">English</option>
         <option value="es">Spanish</option>
       </select>
+      <select
+        value={dataset}
+        onChange={(e) => setDataset(e.target.value as Dataset)}
+      >
+        <option value="sales">Sales</option>
+        <option value="unlocode">UN/LOCODE</option>
+      </select>
       <QueryBuilder
         fields={fields}
-        onQueryChange={(q) => setQuery(q)}
-        query={query}
+        onQueryChange={(q) => (dataset === "sales" ? setQuery : setQueryUNL)(q)}
+        query={dataset === "sales" ? query : queryUNL}
         getOperators={getOperators}
         translations={translations[language]}
         combinators={combinators[language]}
