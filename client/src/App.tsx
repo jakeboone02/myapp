@@ -1,3 +1,4 @@
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { AgChartsReact } from "ag-charts-react";
 import { ColDef } from "ag-grid-community";
 import "ag-grid-community/dist/styles/ag-grid.css";
@@ -158,7 +159,43 @@ function App() {
             ],
           }}
         />
-      ) : null}
+      ) : rawDataUNL?.length ? (
+        <LoadScript
+          googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY!}
+          language={language}
+        >
+          <GoogleMap
+            mapContainerStyle={{ width: "100%", height: "600px" }}
+            center={{ lat: 0, lng: 0 }}
+            zoom={2}
+          >
+            {rawDataUNL
+              .filter((location) => location.latitude && location.longitude)
+              .map((location) => (
+                <Marker
+                  key={location.id}
+                  position={{
+                    lat: location.latitude,
+                    lng: location.longitude,
+                  }}
+                  title={location.name}
+                />
+              ))}
+          </GoogleMap>
+        </LoadScript>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: 600,
+            width: "100%",
+          }}
+        >
+          Load data to see map
+        </div>
+      )}
     </>
   );
 }
