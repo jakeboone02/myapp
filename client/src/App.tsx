@@ -4,7 +4,7 @@ import { ColDef, GridApi } from "ag-grid-community";
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
-import { parseISO } from "date-fns";
+import { addDays, parseISO } from "date-fns";
 import { useState } from "react";
 import QueryBuilder, {
   Field,
@@ -107,7 +107,31 @@ function App() {
   const onClickUpdate = () => {
     (updateQuery.rules as RuleType[]).forEach((r) => {
       gridApi?.getSelectedNodes().forEach((n) => {
-        n.setDataValue(r.field, r.value);
+        let val = n.data[r.field];
+
+        if (r.operator === "=") {
+          if (
+            r.field === "date" ||
+            r.field === "order_date" ||
+            r.field === "ship_date"
+          ) {
+            val = parseISO(r.value);
+          } else if (
+            (gridApi.getColumnDef(r.field) as any).inputType === "number"
+          ) {
+            val = parseFloat(r.value);
+          } else {
+            val = r.value;
+          }
+        } else if (r.operator === "+") {
+          val += parseFloat(r.value);
+        } else if (r.operator === "-") {
+          val -= parseFloat(r.value);
+        } else if (r.operator === "extendBy") {
+          val = addDays(val, parseFloat(r.value));
+        }
+
+        n.setDataValue(r.field, val);
       });
     });
   };
