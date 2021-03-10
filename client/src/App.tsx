@@ -1,10 +1,11 @@
 import { AgChartsReact } from "ag-charts-react";
+import { ColDef } from "ag-grid-community";
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
 import { parseISO } from "date-fns";
 import { useState } from "react";
-import QueryBuilder, { RuleGroupType } from "react-querybuilder";
+import QueryBuilder, { Field, RuleGroupType } from "react-querybuilder";
 import "./App.scss";
 import combinators from "./combinators";
 import CombinatorSelector from "./CombinatorSelector";
@@ -17,11 +18,14 @@ import ValueEditor from "./ValueEditor";
 const processChartData = (chartData: any[]) =>
   chartData.map((cd) => ({ ...cd, order_month: parseISO(cd.order_month) }));
 
-const columnDefs = fields.map((f) => ({
+const columnDefsMapper = (f: Field): ColDef => ({
   ...f,
   field: f.name,
   headerName: f.label,
-}));
+});
+
+const columnDefs = fields["sales"].map(columnDefsMapper);
+const columnDefsUNL = fields["unlocode"].map(columnDefsMapper);
 
 function App() {
   const [query, setQuery] = useState<RuleGroupType>({
@@ -36,6 +40,7 @@ function App() {
   });
   const [language, setLanguage] = useState<Language>("en");
   const [rawData, setRawData] = useState<any[]>([]);
+  const [rawDataUNL, setRawDataUNL] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [dataset, setDataset] = useState<Dataset>("sales");
 
@@ -64,6 +69,29 @@ function App() {
     }
   };
 
+  const getDataUNL = async () => {
+    const body = JSON.stringify(queryUNL);
+    const headers = new Headers({ "Content-Type": "application/json" });
+
+    let res: { data: any[]; error?: string } = {
+      data: [],
+    };
+
+    try {
+      res = await (
+        await fetch("/api/unlocode", { method: "POST", body, headers })
+      ).json();
+    } catch (err) {
+      console.log(err);
+    }
+
+    if (res.error) {
+      console.log(res.error);
+    } else {
+      setRawDataUNL(res.data);
+    }
+  };
+
   return (
     <>
       <select
@@ -81,7 +109,7 @@ function App() {
         <option value="unlocode">UN/LOCODE</option>
       </select>
       <QueryBuilder
-        fields={fields}
+        fields={fields[dataset]}
         onQueryChange={(q) => (dataset === "sales" ? setQuery : setQueryUNL)(q)}
         query={dataset === "sales" ? query : queryUNL}
         getOperators={getOperators}
@@ -92,41 +120,45 @@ function App() {
           valueEditor: ValueEditor,
         }}
       />
-      <button onClick={getData}>Get Data</button>
+      <button onClick={dataset === "sales" ? getData : getDataUNL}>
+        Get Data
+      </button>
       <div className="ag-theme-alpine" style={{ height: 400, width: "100%" }}>
         <AgGridReact
-          columnDefs={columnDefs}
-          rowData={rawData}
+          columnDefs={dataset === "sales" ? columnDefs : columnDefsUNL}
+          rowData={dataset === "sales" ? rawData : rawDataUNL}
           suppressPropertyNamesCheck
         />
       </div>
-      <AgChartsReact
-        options={{
-          data: processChartData(chartData),
-          series: [
-            {
-              type: "line",
-              xKey: "order_month",
-              yKey: "revenue",
-            },
-            {
-              type: "line",
-              xKey: "order_month",
-              yKey: "profit",
-            },
-          ],
-          axes: [
-            {
-              type: "time",
-              position: "bottom",
-            },
-            {
-              type: "number",
-              position: "left",
-            },
-          ],
-        }}
-      />
+      {dataset === "sales" ? (
+        <AgChartsReact
+          options={{
+            data: processChartData(chartData),
+            series: [
+              {
+                type: "line",
+                xKey: "order_month",
+                yKey: "revenue",
+              },
+              {
+                type: "line",
+                xKey: "order_month",
+                yKey: "profit",
+              },
+            ],
+            axes: [
+              {
+                type: "time",
+                position: "bottom",
+              },
+              {
+                type: "number",
+                position: "left",
+              },
+            ],
+          }}
+        />
+      ) : null}
     </>
   );
 }
