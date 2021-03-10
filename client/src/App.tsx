@@ -1,17 +1,22 @@
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { AgChartsReact } from "ag-charts-react";
-import { ColDef } from "ag-grid-community";
+import { ColDef, GridApi } from "ag-grid-community";
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
 import { parseISO } from "date-fns";
 import { useState } from "react";
-import QueryBuilder, { Field, RuleGroupType } from "react-querybuilder";
+import QueryBuilder, {
+  Field,
+  RuleGroupType,
+  RuleType,
+} from "react-querybuilder";
 import "./App.scss";
 import combinators from "./combinators";
 import CombinatorSelector from "./CombinatorSelector";
 import fields from "./fields";
 import getOperators from "./getOperators";
+import getOperatorsForUpdate from "./getOperatorsForUpdate";
 import translations from "./translations";
 import { Dataset, Language } from "./types";
 import ValueEditor from "./ValueEditor";
@@ -34,6 +39,11 @@ function App() {
     combinator: "and",
     rules: [],
   });
+  const [updateQuery, setUpdateQuery] = useState<RuleGroupType>({
+    id: "root",
+    combinator: "and",
+    rules: [],
+  });
   const [queryUNL, setQueryUNL] = useState<RuleGroupType>({
     id: "root",
     combinator: "and",
@@ -44,6 +54,7 @@ function App() {
   const [rawDataUNL, setRawDataUNL] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [dataset, setDataset] = useState<Dataset>("sales");
+  const [gridApi, setGridApi] = useState<GridApi>();
 
   const getData = async () => {
     const body = JSON.stringify(query);
@@ -93,6 +104,14 @@ function App() {
     }
   };
 
+  const onClickUpdate = () => {
+    (updateQuery.rules as RuleType[]).forEach((r) => {
+      gridApi?.getSelectedNodes().forEach((n) => {
+        n.setDataValue(r.field, r.value);
+      });
+    });
+  };
+
   return (
     <>
       <select
@@ -124,10 +143,33 @@ function App() {
       <button onClick={dataset === "sales" ? getData : getDataUNL}>
         Get Data
       </button>
+      <QueryBuilder
+        fields={fields[dataset]}
+        onQueryChange={(q) => setUpdateQuery(q)}
+        query={updateQuery}
+        getOperators={getOperatorsForUpdate}
+        controlElements={{
+          addGroupAction: () => null,
+          combinatorSelector: () => null,
+        }}
+      />
+      <button type="button" onClick={onClickUpdate}>
+        Update
+      </button>
       <div className="ag-theme-alpine" style={{ height: 400, width: "100%" }}>
         <AgGridReact
-          columnDefs={dataset === "sales" ? columnDefs : columnDefsUNL}
+          columnDefs={[
+            {
+              field: "selectionColumn",
+              headerCheckboxSelection: true,
+              checkboxSelection: true,
+              width: 40,
+            },
+            ...(dataset === "sales" ? columnDefs : columnDefsUNL),
+          ]}
+          onGridReady={(gre) => setGridApi(gre.api)}
           rowData={dataset === "sales" ? rawData : rawDataUNL}
+          rowSelection="multiple"
           suppressPropertyNamesCheck
         />
       </div>
