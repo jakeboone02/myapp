@@ -4,7 +4,7 @@ import { ColDef, GridApi } from "ag-grid-community";
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import { AgGridReact } from "ag-grid-react";
-import { addDays, parseISO } from "date-fns";
+import { addDays, format, parseISO } from "date-fns";
 import { useState } from "react";
 import QueryBuilder, {
   Field,
@@ -20,6 +20,7 @@ import getOperatorsForUpdate from "./getOperatorsForUpdate";
 import translations from "./translations";
 import { Dataset, Language } from "./types";
 import ValueEditor from "./ValueEditor";
+import ValueEditorForBulkEdit from "./ValueEditorForBulkEdit";
 
 const processChartData = (chartData: any[]) =>
   chartData.map((cd) => ({ ...cd, order_month: parseISO(cd.order_month) }));
@@ -115,7 +116,7 @@ function App() {
             r.field === "order_date" ||
             r.field === "ship_date"
           ) {
-            val = parseISO(r.value);
+            val = r.value;
           } else if (
             (gridApi.getColumnDef(r.field) as any).inputType === "number"
           ) {
@@ -128,7 +129,10 @@ function App() {
         } else if (r.operator === "-") {
           val -= parseFloat(r.value);
         } else if (r.operator === "extendBy") {
-          val = addDays(val, parseFloat(r.value));
+          val = format(
+            addDays(parseISO(val), parseFloat(r.value)),
+            "yyyy-MM-dd"
+          );
         }
 
         n.setDataValue(r.field, val);
@@ -175,6 +179,7 @@ function App() {
         controlElements={{
           addGroupAction: () => null,
           combinatorSelector: () => null,
+          valueEditor: ValueEditorForBulkEdit,
         }}
       />
       <button type="button" onClick={onClickUpdate}>
