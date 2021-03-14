@@ -13,10 +13,12 @@ import QueryBuilder, {
 } from "react-querybuilder";
 import "./App.scss";
 import combinators from "./combinators";
-import CombinatorSelector from "./CombinatorSelector";
 import fields from "./fields";
 import getOperators from "./getOperators";
 import getOperatorsForUpdate from "./getOperatorsForUpdate";
+import MaterialActionElement from "./MaterialActionElement";
+import MaterialNotToggle from "./MaterialNotToggle";
+import MaterialValueSelector from "./MaterialValueSelector";
 import translations from "./translations";
 import {
   Dataset,
@@ -174,7 +176,14 @@ function App() {
         translations={translations[language]}
         combinators={combinators[language]}
         controlElements={{
-          combinatorSelector: CombinatorSelector,
+          addGroupAction: MaterialActionElement,
+          addRuleAction: MaterialActionElement,
+          fieldSelector: MaterialValueSelector,
+          notToggle: MaterialNotToggle,
+          operatorSelector: MaterialValueSelector,
+          removeGroupAction: MaterialActionElement,
+          removeRuleAction: MaterialActionElement,
+          combinatorSelector: MaterialValueSelector,
           valueEditor: ValueEditor,
         }}
       />
@@ -189,6 +198,12 @@ function App() {
         controlElements={{
           addGroupAction: () => null,
           combinatorSelector: () => null,
+          addRuleAction: MaterialActionElement,
+          fieldSelector: MaterialValueSelector,
+          notToggle: MaterialNotToggle,
+          operatorSelector: MaterialValueSelector,
+          removeGroupAction: MaterialActionElement,
+          removeRuleAction: MaterialActionElement,
           valueEditor: ValueEditorForBulkEdit,
         }}
       />

@@ -1,9 +1,8 @@
+import Input from "@material-ui/core/Input";
 import { format, isValid, parse } from "date-fns";
 import ReactDatePicker from "react-datepicker";
-import {
-  ValueEditor as DefaultValueEditor,
-  ValueEditorProps,
-} from "react-querybuilder";
+import { ValueEditorProps } from "react-querybuilder";
+import MaterialValueEditor from "./MaterialValueEditor";
 
 const ValueEditorForBulkEdit = (props: ValueEditorProps) => {
   const { field, fieldData, operator, value, handleOnChange } = props;
@@ -11,7 +10,7 @@ const ValueEditorForBulkEdit = (props: ValueEditorProps) => {
   if (field === "date" || field === "order_date" || field === "ship_date") {
     if (operator === "extendBy") {
       return (
-        <input
+        <Input
           type="number"
           onChange={(e) => handleOnChange(e.target.value)}
           value={value || ""}
@@ -31,7 +30,7 @@ const ValueEditorForBulkEdit = (props: ValueEditorProps) => {
     );
   } else if (fieldData.inputType === "number") {
     return (
-      <input
+      <Input
         type="number"
         onChange={(e) => handleOnChange(e.target.value)}
         value={value || ""}
@@ -39,7 +38,7 @@ const ValueEditorForBulkEdit = (props: ValueEditorProps) => {
     );
   }
 
-  return <DefaultValueEditor {...props} />;
+  return <MaterialValueEditor {...props} />;
 };
 
 export default ValueEditorForBulkEdit;
