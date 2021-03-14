@@ -1,7 +1,6 @@
 import { ICellRendererParams } from "ag-grid-community";
 import { format, parseISO } from "date-fns";
-import { Field } from "react-querybuilder";
-import { Dataset } from "./types";
+import { Dataset, FieldAndColDef } from "./types";
 
 const priorities = [
   { name: "C", label: "Critical" },
@@ -76,12 +75,12 @@ const statusValuesRefData: Record<string, string> = {};
 statusValues.forEach((sv) => (statusValuesRefData[sv.name] = sv.label));
 
 const dateCellRenderer = ({ value }: ICellRendererParams) =>
-  value ? format(parseISO(value), "yyyy-MM-dd") : null;
+  value ? format(parseISO(value), "yyyy-MM-dd") : "";
 
 const checkMarkCellRenderer = ({ value }: ICellRendererParams) =>
   value ? "✔️" : "";
 
-const fields: Record<Dataset, Field[]> = {
+const fields: Record<Dataset, FieldAndColDef[]> = {
   sales: [
     {
       name: "order_id",

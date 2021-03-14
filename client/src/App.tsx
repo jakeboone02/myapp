@@ -18,11 +18,20 @@ import fields from "./fields";
 import getOperators from "./getOperators";
 import getOperatorsForUpdate from "./getOperatorsForUpdate";
 import translations from "./translations";
-import { Dataset, Language } from "./types";
+import {
+  Dataset,
+  FieldAndColDef,
+  Language,
+  SalesAPIResponse,
+  SalesChartResult,
+  SalesResult,
+  UNLocodeAPIResponse,
+  UNLocodeResult,
+} from "./types";
 import ValueEditor from "./ValueEditor";
 import ValueEditorForBulkEdit from "./ValueEditorForBulkEdit";
 
-const processChartData = (chartData: any[]) =>
+const processChartData = (chartData: SalesChartResult[]) =>
   chartData.map((cd) => ({ ...cd, order_month: parseISO(cd.order_month) }));
 
 const columnDefsMapper = (f: Field): ColDef => ({
@@ -51,9 +60,9 @@ function App() {
     rules: [],
   });
   const [language, setLanguage] = useState<Language>("en");
-  const [rawData, setRawData] = useState<any[]>([]);
-  const [rawDataUNL, setRawDataUNL] = useState<any[]>([]);
-  const [chartData, setChartData] = useState<any[]>([]);
+  const [rawData, setRawData] = useState<SalesResult[]>([]);
+  const [rawDataUNL, setRawDataUNL] = useState<UNLocodeResult[]>([]);
+  const [chartData, setChartData] = useState<SalesChartResult[]>([]);
   const [dataset, setDataset] = useState<Dataset>("sales");
   const [gridApi, setGridApi] = useState<GridApi>();
 
@@ -61,7 +70,7 @@ function App() {
     const body = JSON.stringify(query);
     const headers = new Headers({ "Content-Type": "application/json" });
 
-    let res: { data: any[]; chartData: any[]; error?: string } = {
+    let res: SalesAPIResponse = {
       data: [],
       chartData: [],
     };
@@ -86,7 +95,7 @@ function App() {
     const body = JSON.stringify(queryUNL);
     const headers = new Headers({ "Content-Type": "application/json" });
 
-    let res: { data: any[]; error?: string } = {
+    let res: UNLocodeAPIResponse = {
       data: [],
     };
 
@@ -118,7 +127,8 @@ function App() {
           ) {
             val = r.value;
           } else if (
-            (gridApi.getColumnDef(r.field) as any).inputType === "number"
+            (gridApi.getColumnDef(r.field) as FieldAndColDef).inputType ===
+            "number"
           ) {
             val = parseFloat(r.value);
           } else {
