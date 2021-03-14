@@ -1,3 +1,4 @@
+import { Button, MenuItem, Select } from "@material-ui/core";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { AgChartsReact } from "ag-charts-react";
 import { ColDef, GridApi } from "ag-grid-community";
@@ -154,20 +155,20 @@ function App() {
 
   return (
     <>
-      <select
+      <Select
         value={language}
         onChange={(e) => setLanguage(e.target.value as Language)}
       >
-        <option value="en">English</option>
-        <option value="es">Spanish</option>
-      </select>
-      <select
+        <MenuItem value="en">English</MenuItem>
+        <MenuItem value="es">Spanish</MenuItem>
+      </Select>
+      <Select
         value={dataset}
         onChange={(e) => setDataset(e.target.value as Dataset)}
       >
-        <option value="sales">Sales</option>
-        <option value="unlocode">UN/LOCODE</option>
-      </select>
+        <MenuItem value="sales">Sales</MenuItem>
+        <MenuItem value="unlocode">UN/LOCODE</MenuItem>
+      </Select>
       <QueryBuilder
         fields={fields[dataset]}
         onQueryChange={(q) => (dataset === "sales" ? setQuery : setQueryUNL)(q)}
@@ -187,9 +188,9 @@ function App() {
           valueEditor: ValueEditor,
         }}
       />
-      <button onClick={dataset === "sales" ? getData : getDataUNL}>
+      <Button onClick={dataset === "sales" ? getData : getDataUNL}>
         Get Data
-      </button>
+      </Button>
       <QueryBuilder
         fields={fields[dataset]}
         onQueryChange={(q) => setUpdateQuery(q)}
@@ -207,9 +208,9 @@ function App() {
           valueEditor: ValueEditorForBulkEdit,
         }}
       />
-      <button type="button" onClick={onClickUpdate}>
+      <Button type="button" onClick={onClickUpdate}>
         Update
-      </button>
+      </Button>
       <div className="ag-theme-alpine" style={{ height: 400, width: "100%" }}>
         <AgGridReact
           columnDefs={[
