@@ -11,9 +11,11 @@ import QueryBuilder, {
   RuleGroupType,
   RuleType,
 } from "react-querybuilder";
-import "./App.scss";
+import AntDActionElement from "./AntDActionElement";
+import AntDNotToggle from "./AntDNotToggle";
+import AntDValueSelector from "./AntDValueSelector";
+import "./App.css";
 import combinators from "./combinators";
-import CombinatorSelector from "./CombinatorSelector";
 import fields from "./fields";
 import getOperators from "./getOperators";
 import getOperatorsForUpdate from "./getOperatorsForUpdate";
@@ -174,7 +176,14 @@ function App() {
         translations={translations[language]}
         combinators={combinators[language]}
         controlElements={{
-          combinatorSelector: CombinatorSelector,
+          addGroupAction: AntDActionElement,
+          addRuleAction: AntDActionElement,
+          combinatorSelector: AntDValueSelector,
+          fieldSelector: AntDValueSelector,
+          notToggle: AntDNotToggle,
+          operatorSelector: AntDValueSelector,
+          removeGroupAction: AntDActionElement,
+          removeRuleAction: AntDActionElement,
           valueEditor: ValueEditor,
         }}
       />

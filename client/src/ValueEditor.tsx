@@ -1,10 +1,8 @@
 import { format, isValid, parse } from "date-fns";
 import ReactDatePicker from "react-datepicker";
-import {
-  ValueEditor as DefaultValueEditor,
-  ValueEditorProps,
-} from "react-querybuilder";
 import "react-datepicker/dist/react-datepicker.css";
+import { ValueEditorProps } from "react-querybuilder";
+import AntDValueEditor from "./AntDValueEditor";
 
 const ValueEditor = (props: ValueEditorProps) => {
   const { fieldData, handleOnChange, operator, value } = props;
@@ -24,10 +22,10 @@ const ValueEditor = (props: ValueEditorProps) => {
           selected={value ? parse(value, "yyyy-MM-dd", new Date()) : new Date()}
         />
       </div>
-    )
+    );
   }
 
-  return <DefaultValueEditor {...props} />;
+  return <AntDValueEditor {...props} />;
 };
 
 export default ValueEditor;
