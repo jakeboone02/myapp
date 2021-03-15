@@ -1,7 +1,7 @@
 import { Button, Grid, MenuItem, Select, Typography } from "@material-ui/core";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { AgChartsReact } from "ag-charts-react";
-import { ColDef, GridApi } from "ag-grid-community";
+import { GridApi } from "ag-grid-community";
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridReact } from "ag-grid-react";
@@ -31,13 +31,14 @@ import {
   UNLocodeAPIResponse,
   UNLocodeResult,
 } from "./types";
+import useLocalStorage from "./useLocalStorage";
 import ValueEditor from "./ValueEditor";
 import ValueEditorForBulkEdit from "./ValueEditorForBulkEdit";
 
 const processChartData = (chartData: SalesChartResult[]) =>
   chartData.map((cd) => ({ ...cd, order_month: parseISO(cd.order_month) }));
 
-const columnDefsMapper = (f: Field): ColDef => ({
+const columnDefsMapper = (f: Field): FieldAndColDef => ({
   ...f,
   field: f.name,
   headerName: f.label,
@@ -47,26 +48,29 @@ const columnDefs = fields["sales"].map(columnDefsMapper);
 const columnDefsUNL = fields["unlocode"].map(columnDefsMapper);
 
 function App() {
-  const [query, setQuery] = useState<RuleGroupType>({
+  const [query, setQuery] = useLocalStorage<RuleGroupType>("query", {
     id: "root",
     combinator: "and",
     rules: [],
   });
-  const [updateQuery, setUpdateQuery] = useState<RuleGroupType>({
+  const [updateQuery, setUpdateQuery] = useLocalStorage<RuleGroupType>(
+    "updateQuery",
+    {
+      id: "root",
+      combinator: "and",
+      rules: [],
+    }
+  );
+  const [queryUNL, setQueryUNL] = useLocalStorage<RuleGroupType>("queryUNL", {
     id: "root",
     combinator: "and",
     rules: [],
   });
-  const [queryUNL, setQueryUNL] = useState<RuleGroupType>({
-    id: "root",
-    combinator: "and",
-    rules: [],
-  });
-  const [language, setLanguage] = useState<Language>("en");
+  const [language, setLanguage] = useLocalStorage<Language>("language", "en");
   const [rawData, setRawData] = useState<SalesResult[]>([]);
   const [rawDataUNL, setRawDataUNL] = useState<UNLocodeResult[]>([]);
   const [chartData, setChartData] = useState<SalesChartResult[]>([]);
-  const [dataset, setDataset] = useState<Dataset>("sales");
+  const [dataset, setDataset] = useLocalStorage<Dataset>("dataset", "sales");
   const [gridApi, setGridApi] = useState<GridApi>();
 
   const getData = async () => {
@@ -222,7 +226,10 @@ function App() {
         <Button type="button" onClick={onClickUpdate}>
           Update
         </Button>
-        <div className="ag-theme-material" style={{ height: 400, width: "100%" }}>
+        <div
+          className="ag-theme-material"
+          style={{ height: 400, width: "100%" }}
+        >
           <AgGridReact
             columnDefs={[
               {
