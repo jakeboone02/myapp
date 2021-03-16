@@ -159,7 +159,7 @@ function App() {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={2}>
+      <Grid item xs={12} sm={3} md={2}>
         <Typography variant="h6" gutterBottom>
           Language
         </Typography>
@@ -181,7 +181,7 @@ function App() {
           <MenuItem value="unlocode">UN/LOCODE</MenuItem>
         </Select>
       </Grid>
-      <Grid item xs={10}>
+      <Grid item xs={12} sm={9} md={10}>
         <QueryBuilder
           fields={fields[dataset]}
           onQueryChange={(q) =>
